@@ -67,7 +67,6 @@ design_sensitivity<-function(J, pi, bT, bC, etaT, etaC){
 #' @return Upper bound on the p-value for all distributions of treatment assignment consistent with the sensitivity parameter Gamma.
 #'
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#' @import  tidyverse
 #' @export
 #'
 #' @examples
@@ -78,7 +77,11 @@ design_sensitivity<-function(J, pi, bT, bC, etaT, etaC){
 broadcase.p.value<-function(broad.case,matchvec,z,Gamma,two.sided=FALSE){
   df<-data.frame(broad.case=broad.case,z=z,matchvec=matchvec)
   Y_b<-sum(subset(df,broad.case==1)$z)
-  gdf<-df %>% group_by(matchvec) %>% summarize(m=sum(z),.groups = 'drop')
+  m<-numeric(length(unique(df$matchvec)))
+  for(i in 1:dim(df)[1]){
+    m[i]<-sum(df$z[df$matchvec==i])
+  }
+  gdf<-data.frame(matchvec=1:length(unique(df$matchvec)),m=m)
   J<-table(df$matchvec)[1]
   p2<-gdf$m*Gamma/(gdf$m*Gamma+J-gdf$m)
   p.value2<-pnorm((Y_b-sum(p2))/sqrt(sum(p2*(1-p2))),lower.tail = FALSE)
@@ -107,7 +110,6 @@ broadcase.p.value<-function(broad.case,matchvec,z,Gamma,two.sided=FALSE){
 #' @return Upper bound on the p-value for all distributions of treatment assignment consistent with the sensitivity parameter Gamma.
 #'
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#' @import  tidyverse
 #' @export
 #'
 #' @examples
@@ -120,8 +122,11 @@ broadcase.p.value<-function(broad.case,matchvec,z,Gamma,two.sided=FALSE){
 narrowcase.p.value<-function(narrow.case,matchvec,z,Gamma,Theta,two.sided=FALSE){
   df<-data.frame(narrow.case=narrow.case,z=z,matchvec=matchvec)
   Y_n<-sum(subset(df,narrow.case==1)$z)
-  gdf<-df %>% group_by(matchvec) %>%
-    summarize(m=sum(z),.groups = 'drop')
+  m<-numeric(length(unique(df$matchvec)))
+  for(i in 1:dim(df)[1]){
+    m[i]<-sum(df$z[df$matchvec==i])
+  }
+  gdf<-data.frame(matchvec=1:length(unique(df$matchvec)),m=m)
   J<-table(df$matchvec)[1]
   p2<-gdf$m*Gamma*Theta/(gdf$m*Gamma*Theta+J-gdf$m)
   p.value2<-pnorm((Y_n-sum(p2))/sqrt(sum(p2*(1-p2))),lower.tail = FALSE)
@@ -240,7 +245,7 @@ cal_power<-function(I, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha){
 #' @param upper Upper bound on \eqn{I}. If the calculated power is below pw at the upper bound, output Inf.
 #' @return The number of broad case matched sets needed.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#' @import rootSolve
+#' @importFrom rootSolve uniroot
 #' @export
 #' @examples
 #'
@@ -250,7 +255,7 @@ cal_size_b<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, alpha, upper=1e7){
   if(cal_power(upper, J, pi, bT, bC, etaT, etaC, Gamma, Theta=1, alpha)[1,1]<pw){
     res<-Inf
   }else{
-    res<-round(uniroot(function(I){cal_power(I,J,pi,bT,bC,etaT,etaC,Gamma,Theta=1,alpha)[1,1]-pw} ,c(1,upper))$root)
+    res<-round(rootSolve::uniroot(function(I){cal_power(I,J,pi,bT,bC,etaT,etaC,Gamma,Theta=1,alpha)[1,1]-pw} ,c(1,upper))$root)
   }
   return(res)
 }
@@ -268,7 +273,7 @@ cal_size_b<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, alpha, upper=1e7){
 #' @param alpha Significance level, usually 0.05.
 #' @return The expected number of narrow case matched sets needed.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#' @import rootSolve
+#' @importFrom rootSolve uniroot
 #' @export
 #' @examples
 #'
@@ -278,7 +283,7 @@ cal_size_n<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha, upper){
   if(cal_power(1e7, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha)[1,2]<pw){
     res<-Inf
   }else{
-    res<-round(uniroot(function(I){cal_power(I,J,pi,bT,bC,etaT,etaC,Gamma,Theta,alpha)[1,2]-pw} ,c(1,1e7))$root)
+    res<-round(rootSolve::uniroot(function(I){cal_power(I,J,pi,bT,bC,etaT,etaC,Gamma,Theta,alpha)[1,2]-pw} ,c(1,1e7))$root)
   }
   res<-res*(etaT*bT*pi/(bT*pi+bC*(1-pi))+etaC*bC*(1-pi)/(bT*pi+bC*(1-pi)))
   return(res)
@@ -299,7 +304,8 @@ cal_size_n<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha, upper){
 #' @param method Whether to only include the formula power or both the formula and simulation power.
 #' @return A power plot saved at the working directory.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#' @import reshape2 ggplot2
+#' @importFrom reshape2 melt
+#' @importFrom  ggplot2 ggplot aes geom_line facet_grid ylab xlab theme_bw scale_linetype_manual scale_color_manual ggsave theme
 #' @export
 #' @examples
 #'
