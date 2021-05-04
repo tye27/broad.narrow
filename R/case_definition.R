@@ -245,7 +245,6 @@ cal_power<-function(I, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha){
 #' @param upper Upper bound on \eqn{I}. If the calculated power is below pw at the upper bound, output Inf.
 #' @return The number of broad case matched sets needed.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#' @importFrom rootSolve uniroot
 #' @export
 #' @examples
 #'
@@ -255,7 +254,7 @@ cal_size_b<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, alpha, upper=1e7){
   if(cal_power(upper, J, pi, bT, bC, etaT, etaC, Gamma, Theta=1, alpha)[1,1]<pw){
     res<-Inf
   }else{
-    res<-round(rootSolve::uniroot(function(I){cal_power(I,J,pi,bT,bC,etaT,etaC,Gamma,Theta=1,alpha)[1,1]-pw} ,c(1,upper))$root)
+    res<-round(uniroot(function(I){cal_power(I,J,pi,bT,bC,etaT,etaC,Gamma,Theta=1,alpha)[1,1]-pw} ,c(1,upper))$root)
   }
   return(res)
 }
@@ -273,7 +272,6 @@ cal_size_b<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, alpha, upper=1e7){
 #' @param alpha Significance level, usually 0.05.
 #' @return The expected number of narrow case matched sets needed.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#' @importFrom rootSolve uniroot
 #' @export
 #' @examples
 #'
@@ -283,7 +281,7 @@ cal_size_n<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha, upper){
   if(cal_power(1e7, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha)[1,2]<pw){
     res<-Inf
   }else{
-    res<-round(rootSolve::uniroot(function(I){cal_power(I,J,pi,bT,bC,etaT,etaC,Gamma,Theta,alpha)[1,2]-pw} ,c(1,1e7))$root)
+    res<-round(uniroot(function(I){cal_power(I,J,pi,bT,bC,etaT,etaC,Gamma,Theta,alpha)[1,2]-pw} ,c(1,1e7))$root)
   }
   res<-res*(etaT*bT*pi/(bT*pi+bC*(1-pi))+etaC*bC*(1-pi)/(bT*pi+bC*(1-pi)))
   return(res)
