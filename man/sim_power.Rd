@@ -40,7 +40,8 @@ Simulated Power of Sensitivity Analysis
 }
 \examples{
 
-sim_power(I=1e3, J=6, pi=1/3, bT=0.3, bC=0.1, etaT=0.3, etaC=0.15, n_sim=3000, Gamma=3, Theta=1.5, alpha=0.05)
+sim_power(I=1e3, J=6, pi=1/3, bT=0.3, bC=0.1, etaT=0.3,
+etaC=0.15, n_sim=3000, Gamma=3, Theta=1.5, alpha=0.05)
 
 }
 \references{

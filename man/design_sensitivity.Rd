@@ -30,7 +30,7 @@ A matrix
 Design sensitivity formulas for the broad case and narrow case tests when data is generated as described in Section 4.2
 }
 \examples{
-design_sensitivity(J,pi,bT,bC,etaT,etaC)
+design_sensitivity(J=6,pi=1/3,bT=0.3,bC=0.1,etaT=0.3,etaC=0.15)
 
 
 }

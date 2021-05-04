@@ -23,7 +23,11 @@ cal_size_n(pw, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha, upper)
 
 \item{Gamma}{The sensitivity parameter \eqn{\Gamma} at which the test is conducted, where \eqn{\Gamma\ge 1}. Setting \eqn{\Gamma = 1} is equivalent to assuming exchangeability given the matched sets, and it performs a within-set randomization test.}
 
+\item{Theta}{The sensitivity parameter \eqn{\Theta} at which the test is conducted, where \eqn{\Theta\ge 1}. \eqn{1-\Theta} can be interpreted as the proportion of narrow cases when treated changing case definition when untreated. Setting \eqn{\Theta = 1} means that the treatment on average does not change case definition among always-cases.}
+
 \item{alpha}{Significance level, usually 0.05.}
+
+\item{upper}{Upper bound on \eqn{I}. If the calculated power is below pw at the upper bound, output Inf.}
 }
 \value{
 The expected number of narrow case matched sets needed.

@@ -10,6 +10,8 @@
 #' @param etaC Probability of a broad case being a narrow case when not treated.
 #' @return A data frame.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @export
 #' @examples
 #' data_gen(I=1e3, J=6, pi=1/3, bT=0.3, bC=0.1, etaT=0.3, etaC=0.15)
@@ -39,10 +41,12 @@ data_gen<-function(I, J, pi, bT, bC, etaT, etaC){
 #' \item{broad.case}{The design sensitivity for the broad case test.}
 #' \item{narrow.case}{The design sensitivity for the narrow case test.}
 #' }
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
 #' @export
 #' @examples
-#' design_sensitivity(J,pi,bT,bC,etaT,etaC)
+#' design_sensitivity(J=6,pi=1/3,bT=0.3,bC=0.1,etaT=0.3,etaC=0.15)
 #'
 #'
 design_sensitivity<-function(J, pi, bT, bC, etaT, etaC){
@@ -65,7 +69,8 @@ design_sensitivity<-function(J, pi, bT, bC, etaT, etaC){
 #' @details Sensitivity analysis for the Mantel-Haenszel broad case test \eqn{Y_b} of no treatment effect based on the broad case definition for matched case-control studies.
 #'
 #' @return Upper bound on the p-value for all distributions of treatment assignment consistent with the sensitivity parameter Gamma.
-#'
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
 #' @export
 #'
@@ -106,7 +111,8 @@ broadcase.p.value<-function(broad.case,matchvec,z,Gamma,two.sided=FALSE){
 #' @param two.sided One-sided or two-sided test. Default is FALSE.
 #'
 #' @details Sensitivity analysis for the Mantel-Haenszel broad case test \eqn{Y_b} of no treatment effect based on the broad case definition for matched case-control studies.
-#'
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @return Upper bound on the p-value for all distributions of treatment assignment consistent with the sensitivity parameter Gamma.
 #'
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
@@ -156,11 +162,13 @@ narrowcase.p.value<-function(narrow.case,matchvec,z,Gamma,Theta,two.sided=FALSE)
 #' @param two.sided One-sided or two-sided test. Default is FALSE.
 #' @return A matrix with simulation results.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#'
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @export
 #' @examples
 #'
-#' sim_power(I=1e3, J=6, pi=1/3, bT=0.3, bC=0.1, etaT=0.3, etaC=0.15, n_sim=3000, Gamma=3, Theta=1.5, alpha=0.05)
+#' sim_power(I=1e3, J=6, pi=1/3, bT=0.3, bC=0.1, etaT=0.3,
+#' etaC=0.15, n_sim=10, Gamma=3, Theta=1.5, alpha=0.05)
 #'
 sim_power<-function(I, J, pi, bT, bC, etaT, etaC, n_sim, Gamma, Theta, alpha, two.sided=FALSE){
   pval_res<-matrix(nrow=n_sim,ncol=3)
@@ -191,7 +199,8 @@ sim_power<-function(I, J, pi, bT, bC, etaT, etaC, n_sim, Gamma, Theta, alpha, tw
 #' @param alpha Significance level, usually 0.05.
 #' @return A matrix with calculated power results.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
-#'
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @export
 #' @examples
 #'
@@ -245,6 +254,8 @@ cal_power<-function(I, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha){
 #' @param upper Upper bound on \eqn{I}. If the calculated power is below pw at the upper bound, output Inf.
 #' @return The number of broad case matched sets needed.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @export
 #' @examples
 #'
@@ -269,9 +280,13 @@ cal_size_b<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, alpha, upper=1e7){
 #' @param etaT Probability of a broad case being a narrow case when treated.
 #' @param etaC Probability of a broad case being a narrow case when not treated.
 #' @param Gamma The sensitivity parameter \eqn{\Gamma} at which the test is conducted, where \eqn{\Gamma\ge 1}. Setting \eqn{\Gamma = 1} is equivalent to assuming exchangeability given the matched sets, and it performs a within-set randomization test.
+#' @param Theta The sensitivity parameter \eqn{\Theta} at which the test is conducted, where \eqn{\Theta\ge 1}. \eqn{1-\Theta} can be interpreted as the proportion of narrow cases when treated changing case definition when untreated. Setting \eqn{\Theta = 1} means that the treatment on average does not change case definition among always-cases.
 #' @param alpha Significance level, usually 0.05.
+#' @param upper Upper bound on \eqn{I}. If the calculated power is below pw at the upper bound, output Inf.
 #' @return The expected number of narrow case matched sets needed.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @export
 #' @examples
 #'
@@ -303,7 +318,9 @@ cal_size_n<-function(pw, J, pi, bT, bC, etaT, etaC, Gamma, Theta, alpha, upper){
 #' @return A power plot saved at the working directory.
 #' @references Ting Ye and Dylan S. Small (2021). Combining Broad and Narrow Case Definitions in Matched Case-Control Studies.
 #' @importFrom reshape2 melt
-#' @importFrom  ggplot2 ggplot aes geom_line facet_grid ylab xlab theme_bw scale_linetype_manual scale_color_manual ggsave theme
+#' @importFrom  ggplot2 ggplot aes geom_line facet_grid ylab xlab theme_bw scale_linetype_manual scale_color_manual ggsave theme label_parsed
+#' @importFrom stats pnorm qnorm rbinom uniroot
+#' @importFrom utils write.csv
 #' @export
 #' @examples
 #'
